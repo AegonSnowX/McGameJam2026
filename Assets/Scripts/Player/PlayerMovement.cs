@@ -34,6 +34,7 @@ public class PlayerMovement : MonoBehaviour
     void Awake()
     {
         Instance = this;
+        IsDead = false; // Reset death state on scene load
         
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
@@ -43,6 +44,15 @@ public class PlayerMovement : MonoBehaviour
         if (mainCamera == null)
         {
             mainCamera = Camera.main;
+        }
+    }
+
+    void OnDestroy()
+    {
+        // Clear instance when destroyed
+        if (Instance == this)
+        {
+            Instance = null;
         }
     }
 

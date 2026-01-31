@@ -15,17 +15,26 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        // Always set the instance to the new one (handles scene reloads)
         Instance = this;
+        
+        // Reset game state
+        IsGameOver = false;
+        Time.timeScale = 1f;
         
         // Hide death screen at start
         if (deathScreenUI != null)
         {
             deathScreenUI.SetActive(false);
+        }
+    }
+
+    void OnDestroy()
+    {
+        // Clear instance when destroyed
+        if (Instance == this)
+        {
+            Instance = null;
         }
     }
 
@@ -48,7 +57,7 @@ public class GameManager : MonoBehaviour
             deathScreenUI.SetActive(true);
         }
         
-        // Optional: Pause the game
+        // Pause the game
         Time.timeScale = 0f;
     }
 
