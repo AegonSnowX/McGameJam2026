@@ -6,15 +6,25 @@ public class PlayerMovement : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
     
-    [Header("Mouse Rotation")]
+    [Header("Torch Rotation")]
     [SerializeField] private float mouseDeadzoneRadius = 0.5f;
+    [SerializeField, Range(0f, 90f)] private float torchClampAngle = 45f;
     
     [Header("References")]
+    [SerializeField] private Transform torch;
     [SerializeField] private Camera mainCamera;
 
     private Rigidbody2D rb;
     private Vector2 movementInput;
     private Vector2 mouseWorldPosition;
+    private Vector2 mouseDirection = Vector2.down; // Direction from player to mouse
+
+    // Animation properties - use these in your Animator or PlayerAnimator script
+    public bool IsMoving => movementInput.sqrMagnitude > 0.01f;
+    public float MoveX => movementInput.x;
+    public float MoveY => movementInput.y;
+    public float MouseX => mouseDirection.x;
+    public float MouseY => mouseDirection.y;
 
     void Awake()
     {
@@ -36,8 +46,8 @@ public class PlayerMovement : MonoBehaviour
         movementInput.y = Input.GetAxisRaw("Vertical");
         movementInput = movementInput.normalized;
 
-        // Face towards mouse cursor
-        FaceMouseCursor();
+        // Rotate torch towards mouse cursor and update mouse direction
+        RotateTorchTowardsMouse();
     }
 
     void FixedUpdate()
@@ -46,7 +56,7 @@ public class PlayerMovement : MonoBehaviour
         rb.linearVelocity = movementInput * moveSpeed;
     }
 
-    private void FaceMouseCursor()
+    private void RotateTorchTowardsMouse()
     {
         // Get mouse position in world space
         mouseWorldPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
@@ -54,15 +64,43 @@ public class PlayerMovement : MonoBehaviour
         // Calculate direction from player to mouse
         Vector2 direction = mouseWorldPosition - (Vector2)transform.position;
         
-        // Only rotate if mouse is outside the deadzone
+        // Only update if mouse is outside the deadzone
         if (direction.sqrMagnitude > mouseDeadzoneRadius * mouseDeadzoneRadius)
         {
+            // Store normalized direction for animations
+            mouseDirection = direction.normalized;
+            
             // Calculate the angle in degrees (atan2 gives radians, convert to degrees)
             // Subtract 90 degrees because Unity's "up" is 0 degrees, but atan2 treats "right" as 0
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
             
-            // Apply rotation to player
-            transform.rotation = Quaternion.Euler(0f, 0f, angle);
+            // Clamp torch rotation based on movement direction
+            if (IsMoving)
+            {
+                angle = ClampTorchAngle(angle);
+            }
+            
+            // Apply rotation to torch only (not the player)
+            if (torch != null)
+            {
+                torch.rotation = Quaternion.Euler(0f, 0f, angle);
+            }
         }
+    }
+
+    private float ClampTorchAngle(float angle)
+    {
+        // Calculate base angle from movement direction
+        // Up = 0°, Right = -90°, Down = 180°, Left = 90°
+        float baseAngle = Mathf.Atan2(movementInput.y, movementInput.x) * Mathf.Rad2Deg - 90f;
+        
+        // Calculate the difference between mouse angle and movement angle
+        float angleDiff = Mathf.DeltaAngle(baseAngle, angle);
+        
+        // Clamp the difference within the allowed range
+        angleDiff = Mathf.Clamp(angleDiff, -torchClampAngle, torchClampAngle);
+        
+        // Return the clamped angle
+        return baseAngle + angleDiff;
     }
 }
