@@ -37,16 +37,19 @@ public class MicrophoneInput : MonoBehaviour
 
     void Awake()
     {
-        // Singleton pattern
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        // Always set instance to the new one (handles scene reloads)
         Instance = this;
-        DontDestroyOnLoad(gameObject);
-
         sampleData = new float[sampleWindow];
+    }
+
+    void OnDestroy()
+    {
+          StopMicrophone();
+        // Clear instance when destroyed
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     void Start()
@@ -64,10 +67,6 @@ public class MicrophoneInput : MonoBehaviour
         }
     }
 
-    void OnDestroy()
-    {
-        StopMicrophone();
-    }
 
     void OnApplicationFocus(bool hasFocus)
     {

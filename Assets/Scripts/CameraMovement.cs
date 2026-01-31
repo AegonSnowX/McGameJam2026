@@ -23,11 +23,23 @@ public class CameraFollow : MonoBehaviour
     {
         Instance = this;
         
+        // Reset shake state on scene load
+        currentShakeIntensity = 0f;
+        shakeOffset = Vector3.zero;
+        
         if (target == null) return;
 
         Vector3 pos = target.position;
         pos.z = transform.position.z; // preserve camera depth
         transform.position = pos;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     void Start()
