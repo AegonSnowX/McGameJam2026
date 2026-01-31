@@ -30,6 +30,12 @@ public class Enemy : MonoBehaviour
     
     [Header("Memory")]
     [SerializeField] private float memoryDuration = 3f;
+    
+    [Header("Attack")]
+    [SerializeField] private float attackAnimationDuration = 1.5f;
+    
+    [Header("Animation")]
+    [SerializeField] private Animator animator;
 
     private NavMeshAgent agent;
     private EnemyState currentState = EnemyState.Patrolling;
@@ -40,12 +46,16 @@ public class Enemy : MonoBehaviour
     private bool isWaitingAtPatrol;
     private float wanderTimer;
     private Vector3 wanderTarget;
+    private Vector2 lastMoveDirection;
+    private PlayerMovement attackTarget;
+    private bool isAttacking;
 
     public enum EnemyState
     {
         Patrolling,
         Chasing,
-        Searching
+        Searching,
+        Attacking
     }
 
     public EnemyState CurrentState => currentState;
@@ -63,10 +73,27 @@ public class Enemy : MonoBehaviour
         agent.updateRotation = false;
         agent.updateUpAxis = false;
         agent.speed = patrolSpeed;
+        
+        // Auto-find animator if not assigned
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>();
+            if (animator == null)
+            {
+                animator = GetComponentInChildren<Animator>();
+            }
+        }
     }
 
     void Update()
     {
+        // Don't do anything while attacking
+        if (currentState == EnemyState.Attacking)
+        {
+            UpdateAnimator();
+            return;
+        }
+        
         float noiseLevel = GetNoiseLevel();
         
         switch (currentState)
@@ -84,10 +111,34 @@ public class Enemy : MonoBehaviour
                 SearchForPlayer(noiseLevel);
                 break;
         }
+        
+        UpdateAnimator();
+    }
+    
+    private void UpdateAnimator()
+    {
+        if (animator == null) return;
+        
+        // Calculate movement direction
+        Vector2 velocity = new Vector2(agent.velocity.x, agent.velocity.y);
+        bool isMoving = velocity.sqrMagnitude > 0.01f;
+        
+        if (isMoving)
+        {
+            lastMoveDirection = velocity.normalized;
+        }
+        
+        // Set animator parameters
+        animator.SetBool("IsMoving", isMoving && currentState != EnemyState.Attacking);
+        animator.SetFloat("MoveX", lastMoveDirection.x);
+        animator.SetFloat("MoveY", lastMoveDirection.y);
+        animator.SetBool("Attack", isAttacking);
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (currentState == EnemyState.Attacking) return;
+        
         if (other.CompareTag(playerTag))
         {
             PlayerMovement player = other.GetComponent<PlayerMovement>();
@@ -98,9 +149,45 @@ public class Enemy : MonoBehaviour
             
             if (player != null && !player.IsDead)
             {
-                player.Die();
+                StartAttack(player);
             }
         }
+    }
+    
+    private void StartAttack(PlayerMovement player)
+    {
+        currentState = EnemyState.Attacking;
+        attackTarget = player;
+        isAttacking = true;
+        
+        // Stop moving
+        agent.isStopped = true;
+        agent.velocity = Vector3.zero;
+        
+        // Face the player
+        Vector2 directionToPlayer = (player.transform.position - transform.position).normalized;
+        lastMoveDirection = directionToPlayer;
+        
+        Debug.Log("Enemy: Attacking player!");
+        
+        // Start attack coroutine
+        StartCoroutine(AttackCoroutine());
+    }
+    
+    private System.Collections.IEnumerator AttackCoroutine()
+    {
+        // Wait for attack animation to play
+        yield return new WaitForSeconds(attackAnimationDuration);
+        
+        // Kill the player after animation
+        if (attackTarget != null && !attackTarget.IsDead)
+        {
+            attackTarget.Die();
+        }
+        
+        // Reset attack state (in case game continues somehow)
+        isAttacking = false;
+        agent.isStopped = false;
     }
 
     private float GetNoiseLevel()
