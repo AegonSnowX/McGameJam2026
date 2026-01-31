@@ -3,6 +3,8 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
 {
+    public static PlayerMovement Instance { get; private set; }
+    
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
     
@@ -25,9 +27,14 @@ public class PlayerMovement : MonoBehaviour
     public float MoveY => movementInput.y;
     public float MouseX => mouseDirection.x;
     public float MouseY => mouseDirection.y;
+    
+    // Death state
+    public bool IsDead { get; private set; }
 
     void Awake()
     {
+        Instance = this;
+        
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
@@ -41,6 +48,8 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        if (IsDead) return;
+        
         // Get WASD input
         movementInput.x = Input.GetAxisRaw("Horizontal");
         movementInput.y = Input.GetAxisRaw("Vertical");
@@ -52,8 +61,31 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (IsDead)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+        
         // Apply movement
         rb.linearVelocity = movementInput * moveSpeed;
+    }
+    
+    public void Die()
+    {
+        if (IsDead) return;
+        
+        IsDead = true;
+        movementInput = Vector2.zero;
+        rb.linearVelocity = Vector2.zero;
+        
+        Debug.Log("Player died!");
+        
+        // Notify GameManager
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnPlayerDeath();
+        }
     }
 
     private void RotateTorchTowardsMouse()
