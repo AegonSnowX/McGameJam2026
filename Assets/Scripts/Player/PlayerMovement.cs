@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
@@ -7,33 +6,24 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float moveSpeed = 5f;
 
     Rigidbody2D rb;
-    Vector2 moveInput;
-
-    PlayerInputActions inputActions;
+    Vector2 input;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
-
-        inputActions = new PlayerInputActions();
     }
 
-    void OnEnable()
+    void Update()
     {
-        inputActions.Player.Enable();
-        inputActions.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
-        inputActions.Player.Move.canceled += ctx => moveInput = Vector2.zero;
-    }
-
-    void OnDisable()
-    {
-        inputActions.Player.Disable();
+        input.x = Input.GetAxisRaw("Horizontal");
+        input.y = Input.GetAxisRaw("Vertical");
+        input = input.normalized;
     }
 
     void FixedUpdate()
     {
-        rb.velocity = moveInput.normalized * moveSpeed;
+        rb.linearVelocity = input * moveSpeed;
     }
 }
