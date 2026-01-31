@@ -19,10 +19,19 @@ public class KeyCollectible : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (_collected) return;
-        if (!other.CompareTag("Player")) return;
+        HandleTrigger(other);
+    }
 
-        if (GameManager.Instance == null) return;
+    /// <summary>
+    /// Call this from a child's KeyTriggerForwarder if the trigger collider is on a child object.
+    /// </summary>
+    public void HandleTrigger(Collider2D other)
+    {
+        if (_collected) return;
+
+        // Detect player by component so it works even without "Player" tag
+        var player = other.GetComponent<PlayerMovement>() ?? other.GetComponentInParent<PlayerMovement>();
+        if (player == null) return;
 
         _collected = true;
 
@@ -32,9 +41,11 @@ public class KeyCollectible : MonoBehaviour
         if (visualToHideOnCollect != null)
             visualToHideOnCollect.SetActive(false);
 
-        GameManager.Instance.AddKey();
+        if (GameManager.Instance != null)
+            GameManager.Instance.AddKey();
+        else
+            Debug.LogWarning("KeyCollectible: No GameManager in scene. Key collected but win condition will not update.");
 
-        // Destroy after a short delay so sound can play
         float destroyDelay = 0.1f;
         if (collectSound != null && collectSound.clip != null)
             destroyDelay = collectSound.clip.length + 0.1f;
