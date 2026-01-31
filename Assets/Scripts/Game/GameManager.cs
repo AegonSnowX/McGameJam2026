@@ -7,11 +7,16 @@ public class GameManager : MonoBehaviour
 
     [Header("UI References")]
     [SerializeField] private GameObject deathScreenUI;
+    [SerializeField] private GameObject winScreenUI;
     
     [Header("Settings")]
     [SerializeField] private float deathScreenDelay = 0.5f;
+    [SerializeField] private int keysRequiredToWin = 3;
 
     public bool IsGameOver { get; private set; }
+    public bool HasWon { get; private set; }
+    public int KeysCollected { get; private set; }
+    public int KeysRequired => keysRequiredToWin;
 
     void Awake()
     {
@@ -20,13 +25,34 @@ public class GameManager : MonoBehaviour
         
         // Reset game state
         IsGameOver = false;
+        HasWon = false;
+        KeysCollected = 0;
         Time.timeScale = 1f;
         
-        // Hide death screen at start
-        if (deathScreenUI != null)
+        // Hide screens at start
+        if (deathScreenUI != null) deathScreenUI.SetActive(false);
+        if (winScreenUI != null) winScreenUI.SetActive(false);
+    }
+
+    /// <summary>
+    /// Call when player collects a key. Wins the game when enough keys are collected.
+    /// </summary>
+    public void AddKey()
+    {
+        if (IsGameOver || HasWon) return;
+        KeysCollected++;
+        if (KeysCollected >= keysRequiredToWin)
         {
-            deathScreenUI.SetActive(false);
+            OnPlayerWin();
         }
+    }
+
+    private void OnPlayerWin()
+    {
+        if (HasWon) return;
+        HasWon = true;
+        Time.timeScale = 0f;
+        if (winScreenUI != null) winScreenUI.SetActive(true);
     }
 
     void OnDestroy()

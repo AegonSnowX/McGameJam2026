@@ -49,6 +49,9 @@ public class Enemy : MonoBehaviour
     private Vector2 lastMoveDirection;
     private PlayerMovement attackTarget;
     private bool isAttacking;
+    private bool chasingTrapSound;
+    private Vector3 trapSoundPosition;
+    private float trapSoundEndTime;
 
     public enum EnemyState
     {
@@ -99,15 +102,20 @@ public class Enemy : MonoBehaviour
         switch (currentState)
         {
             case EnemyState.Patrolling:
+                if (CheckForTrapSound()) break;
                 Patrol();
                 CheckForPlayer(noiseLevel);
                 break;
                 
             case EnemyState.Chasing:
-                ChasePlayer(noiseLevel);
+                if (chasingTrapSound)
+                    ChaseTrapSound(noiseLevel);
+                else
+                    ChasePlayer(noiseLevel);
                 break;
                 
             case EnemyState.Searching:
+                if (CheckForTrapSound()) break;
                 SearchForPlayer(noiseLevel);
                 break;
         }
@@ -196,6 +204,47 @@ public class Enemy : MonoBehaviour
         return MicrophoneInput.Instance.NoiseLevel;
     }
 
+    /// <summary>
+    /// If a trap sound is active and in range, start chasing it. Returns true if we started chasing sound.
+    /// </summary>
+    private bool CheckForTrapSound()
+    {
+        if (TrapSoundManager.Instance == null || !TrapSoundManager.Instance.HasActiveSound)
+            return false;
+
+        Vector3 soundPos = TrapSoundManager.Instance.SoundPosition;
+        float distanceToSound = Vector3.Distance(transform.position, soundPos);
+        if (distanceToSound > detectionRadius)
+            return false;
+
+        chasingTrapSound = true;
+        trapSoundPosition = soundPos;
+        trapSoundEndTime = Time.time + memoryDuration; // chase for a while
+        currentState = EnemyState.Chasing;
+        return true;
+    }
+
+    private void ChaseTrapSound(float noiseLevel)
+    {
+        if (Time.time >= trapSoundEndTime || (TrapSoundManager.Instance != null && !TrapSoundManager.Instance.HasActiveSound))
+        {
+            chasingTrapSound = false;
+            StartSearching();
+            lastKnownPlayerPosition = trapSoundPosition;
+            return;
+        }
+
+        agent.speed = Mathf.Lerp(baseSpeed, maxChaseSpeed, 0.8f);
+        agent.SetDestination(trapSoundPosition);
+
+        if (!agent.pathPending && agent.remainingDistance < 0.5f)
+        {
+            chasingTrapSound = false;
+            StartSearching();
+            lastKnownPlayerPosition = trapSoundPosition;
+        }
+    }
+
     private void CheckForPlayer(float noiseLevel)
     {
         if (target == null) return;
@@ -205,12 +254,14 @@ public class Enemy : MonoBehaviour
         // Player is loud and within detection range
         if (noiseLevel > noiseThresholdToChase && distanceToPlayer < detectionRadius)
         {
+            chasingTrapSound = false;
             StartChasing();
         }
     }
 
     private void StartChasing()
     {
+        chasingTrapSound = false;
         currentState = EnemyState.Chasing;
         isWaitingAtPatrol = false;
         Debug.Log("Enemy: Player detected! Chasing...");
