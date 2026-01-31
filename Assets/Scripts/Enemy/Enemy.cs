@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.AI;
 
+[RequireComponent(typeof(BoxCollider2D))]
 public class Enemy : MonoBehaviour
 {
     [Header("Target")]
     [SerializeField] private Transform target;
+    [SerializeField] private string playerTag = "Player";
     
     [Header("Speed Settings")]
     [SerializeField] private float baseSpeed = 2f;
@@ -48,6 +50,13 @@ public class Enemy : MonoBehaviour
 
     public EnemyState CurrentState => currentState;
 
+    void Awake()
+    {
+        // Ensure collider is set as trigger for kill zone
+        var collider = GetComponent<BoxCollider2D>();
+        collider.isTrigger = true;
+    }
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -74,6 +83,23 @@ public class Enemy : MonoBehaviour
             case EnemyState.Searching:
                 SearchForPlayer(noiseLevel);
                 break;
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag(playerTag))
+        {
+            PlayerMovement player = other.GetComponent<PlayerMovement>();
+            if (player == null)
+            {
+                player = other.GetComponentInParent<PlayerMovement>();
+            }
+            
+            if (player != null && !player.IsDead)
+            {
+                player.Die();
+            }
         }
     }
 
