@@ -25,6 +25,8 @@ public class NoiseDoor : MonoBehaviour
 
     [Header("Secret room")]
     [SerializeField] private GameObject secretRoom;
+    [Tooltip("Optional: set inactive when noise condition is met and secret level opens (e.g. hint, blocker).")]
+    [SerializeField] private GameObject setInactiveWhenOpened;
 
     [Header("Optional")]
     [SerializeField] private string playerTag = "Player";
@@ -178,5 +180,12 @@ public class NoiseDoor : MonoBehaviour
         }
         else if (debugLogs)
             Debug.LogWarning("[NoiseDoor] " + gameObject.name + ": No Secret Room assigned. Assign the secret room GameObject.", this);
+
+        if (setInactiveWhenOpened != null)
+        {
+            setInactiveWhenOpened.SetActive(false);
+            if (debugLogs)
+                Debug.Log("[NoiseDoor] " + gameObject.name + ": Set inactive when opened: " + setInactiveWhenOpened.name + ".", this);
+        }
     }
 }

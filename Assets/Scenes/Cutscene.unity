@@ -774,7 +774,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 200, y: 178.57}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1194074741
 MonoBehaviour:
@@ -793,6 +793,7 @@ MonoBehaviour:
   characterDelay: 0.05
   lineDelay: 0.5
   typeByCharacter: 1
+  linesPerClick: 2
   nextSceneName: FinalLevel
   delayBeforeSceneChange: 2
   typingSound: {fileID: 0}
@@ -846,8 +847,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
-  m_fontSizeBase: 18
+  m_fontSize: 28
+  m_fontSizeBase: 28
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -885,7 +886,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -420.16675, y: -268.10632, z: -434.17236, w: -266.10556}
+  m_margin: {x: -420.16675, y: -195.21881, z: -434.17236, w: -266.10556}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
