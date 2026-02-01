@@ -38,6 +38,8 @@ public class Enemy : MonoBehaviour
     [SerializeField] private Animator animator;
 
     [Header("Sound (3D / spatial – set AudioSource spatialBlend to 1)")]
+    [Tooltip("Delay in seconds before patrol/chase sounds start (e.g. 2 for menu background so it doesn't play immediately).")]
+    [SerializeField] private float soundStartDelay = 0f;
     [SerializeField] private AudioSource patrolSound;
     [SerializeField] private AudioSource chaseSound;
     [SerializeField] private AudioSource attackSound;
@@ -58,6 +60,7 @@ public class Enemy : MonoBehaviour
     private Vector3 trapSoundPosition;
     private float trapSoundEndTime;
     private EnemyState _previousState;
+    private float _soundStartTime;
 
     public enum EnemyState
     {
@@ -94,6 +97,7 @@ public class Enemy : MonoBehaviour
         }
 
         _previousState = (EnemyState)(-1); // So first Update triggers patrol/chase sound on state enter
+        _soundStartTime = Time.time + soundStartDelay;
     }
 
     void Update()
@@ -135,6 +139,7 @@ public class Enemy : MonoBehaviour
     
     private void UpdateEnemySounds()
     {
+        if (Time.time < _soundStartTime) return;
         if (_previousState == currentState) return;
 
         if (patrolSound != null)
