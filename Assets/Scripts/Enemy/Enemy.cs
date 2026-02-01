@@ -102,13 +102,20 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.Instance != null && GameManager.Instance.IsPaused)
+        {
+            if (agent != null) agent.isStopped = true;
+            return;
+        }
+        if (agent != null) agent.isStopped = false;
+
         // Don't do anything while attacking
         if (currentState == EnemyState.Attacking)
         {
             UpdateAnimator();
             return;
         }
-        
+
         float noiseLevel = GetNoiseLevel();
         
         switch (currentState)

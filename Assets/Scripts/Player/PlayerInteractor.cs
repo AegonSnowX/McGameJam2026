@@ -15,6 +15,8 @@ public class PlayerInteractor : MonoBehaviour
     {
         if (PlayerMovement.Instance != null && PlayerMovement.Instance.IsDead)
             return;
+        if (GameManager.Instance != null && GameManager.Instance.IsPaused)
+            return;
 
         if (!Input.GetKeyDown(interactKey))
             return;
