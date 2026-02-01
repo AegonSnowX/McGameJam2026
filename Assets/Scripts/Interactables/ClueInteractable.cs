@@ -9,6 +9,10 @@ public class ClueInteractable : MonoBehaviour, IInteractable
     [SerializeField] private string clueText = "Clue text here.";
     [SerializeField] private bool destroyAfterClose = true;
 
+    [Header("Sound")]
+    [SerializeField] private AudioSource openSound;
+    [SerializeField] private AudioSource closeSound;
+
     [Header("In-range visuals (show when player can interact)")]
     [SerializeField] private GameObject outlineVisual;
     [SerializeField] private GameObject pressEPrompt;
@@ -71,6 +75,9 @@ public class ClueInteractable : MonoBehaviour, IInteractable
         _used = true;
         SetInRangeVisuals(false);
 
+        if (openSound != null)
+            openSound.Play();
+
         if (clueCanvas != null)
         {
             clueCanvas.SetActive(true);
@@ -88,6 +95,9 @@ public class ClueInteractable : MonoBehaviour, IInteractable
 
     private void OnClueClosed()
     {
+        if (closeSound != null)
+            closeSound.Play();
+
         if (clueCanvas != null)
             clueCanvas.SetActive(false);
 

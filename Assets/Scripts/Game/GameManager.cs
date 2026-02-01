@@ -51,6 +51,8 @@ public class GameManager : MonoBehaviour
     {
         if (HasWon) return;
         HasWon = true;
+        if (GameAudioManager.Instance != null)
+            GameAudioManager.Instance.PlayWinSound();
         Time.timeScale = 0f;
         if (winScreenUI != null) winScreenUI.SetActive(true);
     }
@@ -69,7 +71,9 @@ public class GameManager : MonoBehaviour
         if (IsGameOver) return;
         
         IsGameOver = true;
-        
+        if (GameAudioManager.Instance != null)
+            GameAudioManager.Instance.PlayDeathSound();
+
         // Show death screen after short delay
         StartCoroutine(ShowDeathScreenDelayed());
     }

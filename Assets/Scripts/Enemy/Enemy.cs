@@ -37,6 +37,11 @@ public class Enemy : MonoBehaviour
     [Header("Animation")]
     [SerializeField] private Animator animator;
 
+    [Header("Sound (3D / spatial – set AudioSource spatialBlend to 1)")]
+    [SerializeField] private AudioSource patrolSound;
+    [SerializeField] private AudioSource chaseSound;
+    [SerializeField] private AudioSource attackSound;
+
     private NavMeshAgent agent;
     private EnemyState currentState = EnemyState.Patrolling;
     private Vector3 lastKnownPlayerPosition;
@@ -52,6 +57,7 @@ public class Enemy : MonoBehaviour
     private bool chasingTrapSound;
     private Vector3 trapSoundPosition;
     private float trapSoundEndTime;
+    private EnemyState _previousState;
 
     public enum EnemyState
     {
@@ -86,6 +92,8 @@ public class Enemy : MonoBehaviour
                 animator = GetComponentInChildren<Animator>();
             }
         }
+
+        _previousState = (EnemyState)(-1); // So first Update triggers patrol/chase sound on state enter
     }
 
     void Update()
@@ -119,10 +127,37 @@ public class Enemy : MonoBehaviour
                 SearchForPlayer(noiseLevel);
                 break;
         }
-        
+
+        UpdateEnemySounds();
+        _previousState = currentState;
         UpdateAnimator();
     }
     
+    private void UpdateEnemySounds()
+    {
+        if (_previousState == currentState) return;
+
+        if (patrolSound != null)
+        {
+            if (currentState == EnemyState.Patrolling)
+            {
+                if (!patrolSound.isPlaying) patrolSound.Play();
+            }
+            else
+                patrolSound.Stop();
+        }
+
+        if (chaseSound != null)
+        {
+            if (currentState == EnemyState.Chasing)
+            {
+                if (!chaseSound.isPlaying) chaseSound.Play();
+            }
+            else
+                chaseSound.Stop();
+        }
+    }
+
     private void UpdateAnimator()
     {
         if (animator == null) return;
@@ -177,7 +212,9 @@ public class Enemy : MonoBehaviour
         lastMoveDirection = directionToPlayer;
         
         Debug.Log("Enemy: Attacking player!");
-        
+        if (attackSound != null)
+            attackSound.Play();
+
         // Start attack coroutine
         StartCoroutine(AttackCoroutine());
     }
