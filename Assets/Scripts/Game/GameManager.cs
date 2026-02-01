@@ -56,10 +56,13 @@ public class GameManager : MonoBehaviour
         if (keyIndex == 1 && !HasKey1) { HasKey1 = true; KeysCollected++; }
         else if (keyIndex == 2 && !HasKey2) { HasKey2 = true; KeysCollected++; }
         else if (keyIndex == 3 && !HasKey3) { HasKey3 = true; KeysCollected++; }
-        if (KeysCollected >= keysRequiredToWin)
-        {
-            OnPlayerWin();
-        }
+        // Win is now triggered by going through the win door, not by collecting all keys.
+    }
+
+    /// <summary>Call when the player exits through the win door (after collecting all keys).</summary>
+    public void TriggerWin()
+    {
+        OnPlayerWin();
     }
 
     private void OnPlayerWin()

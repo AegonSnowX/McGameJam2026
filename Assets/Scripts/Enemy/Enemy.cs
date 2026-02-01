@@ -107,11 +107,15 @@ public class Enemy : MonoBehaviour
             if (agent != null) agent.isStopped = true;
             return;
         }
-        if (agent != null) agent.isStopped = false;
+        // Keep enemy frozen during attack; only allow movement when not attacking
+        if (currentState != EnemyState.Attacking && agent != null)
+            agent.isStopped = false;
 
-        // Don't do anything while attacking
+        // Don't do anything while attacking (stay frozen, only update animator)
         if (currentState == EnemyState.Attacking)
         {
+            if (agent != null) agent.isStopped = true;
+            agent.velocity = Vector3.zero;
             UpdateAnimator();
             return;
         }
@@ -214,20 +218,22 @@ public class Enemy : MonoBehaviour
         currentState = EnemyState.Attacking;
         attackTarget = player;
         isAttacking = true;
-        
-        // Stop moving
+
+        // Freeze enemy
         agent.isStopped = true;
         agent.velocity = Vector3.zero;
-        
+
+        // Freeze player (no input, no movement) until death
+        player.SetBeingAttacked(true);
+
         // Face the player
         Vector2 directionToPlayer = (player.transform.position - transform.position).normalized;
         lastMoveDirection = directionToPlayer;
-        
+
         Debug.Log("Enemy: Attacking player!");
         if (attackSound != null)
             attackSound.Play();
 
-        // Start attack coroutine
         StartCoroutine(AttackCoroutine());
     }
     
