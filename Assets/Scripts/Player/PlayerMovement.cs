@@ -6,7 +6,14 @@ public class PlayerMovement : MonoBehaviour
     public static PlayerMovement Instance { get; private set; }
     
     [Header("Movement")]
-    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float moveSpeed = 3f;
+    
+    [Header("Dash")]
+    [SerializeField] private float dashSpeed = 5f;
+    [SerializeField] private float dashDuration = 3f;
+    [SerializeField] private float dashCooldown = 10f;
+    [SerializeField] private float dashAttractDuration = 5f;
+    [SerializeField] private KeyCode dashKey = KeyCode.Mouse0;
     
     [Header("Torch Rotation")]
     [SerializeField] private float mouseDeadzoneRadius = 0.5f;
@@ -20,6 +27,12 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 movementInput;
     private Vector2 mouseWorldPosition;
     private Vector2 mouseDirection = Vector2.down; // Direction from player to mouse
+    
+    // Dash state
+    private bool isDashing;
+    private float dashTimeRemaining;
+    private float dashCooldownRemaining;
+    private Vector3 dashStartPosition;
 
     // Animation properties - use these in your Animator or PlayerAnimator script
     public bool IsMoving => movementInput.sqrMagnitude > 0.01f;
@@ -27,6 +40,12 @@ public class PlayerMovement : MonoBehaviour
     public float MoveY => movementInput.y;
     public float MouseX => mouseDirection.x;
     public float MouseY => mouseDirection.y;
+    
+    // Dash properties for UI
+    public bool IsDashing => isDashing;
+    public bool CanDash => dashCooldownRemaining <= 0f && !isDashing;
+    public float DashCooldownRemaining => dashCooldownRemaining;
+    public float DashCooldownTotal => dashCooldown;
     
     // Death state
     public bool IsDead { get; private set; }
@@ -73,6 +92,28 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
+        // Update dash cooldown
+        if (dashCooldownRemaining > 0f)
+        {
+            dashCooldownRemaining -= Time.deltaTime;
+        }
+
+        // Update dash duration
+        if (isDashing)
+        {
+            dashTimeRemaining -= Time.deltaTime;
+            if (dashTimeRemaining <= 0f)
+            {
+                EndDash();
+            }
+        }
+
+        // Check for dash input
+        if (Input.GetKeyDown(dashKey) && CanDash)
+        {
+            StartDash();
+        }
+
         // Get WASD input
         movementInput.x = Input.GetAxisRaw("Horizontal");
         movementInput.y = Input.GetAxisRaw("Vertical");
@@ -100,8 +141,33 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        // Apply movement
-        rb.linearVelocity = movementInput * moveSpeed;
+        // Apply movement - use dash speed if dashing
+        float currentSpeed = isDashing ? dashSpeed : moveSpeed;
+        rb.linearVelocity = movementInput * currentSpeed;
+    }
+
+    private void StartDash()
+    {
+        isDashing = true;
+        dashTimeRemaining = dashDuration;
+        dashStartPosition = transform.position;
+        
+        Debug.Log("[Player] Dash started!");
+        
+        // Attract monsters to dash start position
+        if (TrapSoundManager.Instance != null)
+        {
+            TrapSoundManager.Instance.ActivateSound(dashStartPosition, dashAttractDuration);
+            Debug.Log("[Player] Monsters attracted to dash position for " + dashAttractDuration + " seconds.");
+        }
+    }
+
+    private void EndDash()
+    {
+        isDashing = false;
+        dashCooldownRemaining = dashCooldown;
+        
+        Debug.Log("[Player] Dash ended. Cooldown: " + dashCooldown + " seconds.");
     }
 
     /// <summary>Called by Enemy when attack starts. Freezes player until death.</summary>

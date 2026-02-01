@@ -139,9 +139,9 @@ MonoBehaviour:
   maxChaseSpeed: 3
   detectionRadius: 10
   noiseMultiplier: 2
-  noiseThresholdToChase: 0.25
-  noiseThresholdToLose: 0.05
-  chaseCommitTime: 5
+  noiseThresholdToChase: 0.6
+  noiseThresholdToLose: 0.35
+  chaseCommitTime: 2
   patrolPoints: []
   patrolWaitTime: 2
   patrolSpeed: 0.5
