@@ -141,6 +141,7 @@ MonoBehaviour:
   noiseMultiplier: 2
   noiseThresholdToChase: 0.2
   noiseThresholdToLose: 0.05
+  chaseCommitTime: 5
   patrolPoints: []
   patrolWaitTime: 2
   patrolSpeed: 2

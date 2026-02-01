@@ -16,7 +16,10 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float detectionRadius = 15f;
     [SerializeField] private float noiseMultiplier = 2f;
     [SerializeField, Range(0f, 1f)] private float noiseThresholdToChase = 0.2f;
-    [SerializeField, Range(0f, 1f)] private float noiseThresholdToLose = 0.05f;
+    [Tooltip("Only start 'losing' the player when noise drops below this. Lower = enemy sticks to chase longer (e.g. 0.02).")]
+    [SerializeField, Range(0f, 1f)] private float noiseThresholdToLose = 0.02f;
+    [Tooltip("Once chasing, don't give up for at least this many seconds (avoids dropping due to brief mic dips).")]
+    [SerializeField] private float chaseCommitTime = 2f;
     
     [Header("Patrol Settings")]
     [SerializeField] private Transform[] patrolPoints;
@@ -29,7 +32,8 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float maxWanderInterval = 5f;
     
     [Header("Memory")]
-    [SerializeField] private float memoryDuration = 3f;
+    [Tooltip("How long to keep chasing last known position after player goes quiet. Longer = more persistent.")]
+    [SerializeField] private float memoryDuration = 5f;
     
     [Header("Attack")]
     [SerializeField] private float attackAnimationDuration = 1.5f;
@@ -61,6 +65,7 @@ public class Enemy : MonoBehaviour
     private float trapSoundEndTime;
     private EnemyState _previousState;
     private float _soundStartTime;
+    private float _chaseStartTime;
 
     public enum EnemyState
     {
@@ -319,6 +324,7 @@ public class Enemy : MonoBehaviour
         chasingTrapSound = false;
         currentState = EnemyState.Chasing;
         isWaitingAtPatrol = false;
+        _chaseStartTime = Time.time;
         Debug.Log("Enemy: Player detected! Chasing...");
     }
 
@@ -326,29 +332,33 @@ public class Enemy : MonoBehaviour
     {
         if (target == null) return;
 
-        // Update last known position while player is loud
+        // Update last known position while player is loud enough
         if (noiseLevel > noiseThresholdToLose)
         {
             lastKnownPlayerPosition = target.position;
             memoryTimer = memoryDuration;
-            
-            // Speed scales with noise level
-            float speedBoost = noiseLevel * noiseMultiplier;
-            agent.speed = Mathf.Lerp(baseSpeed, maxChaseSpeed, speedBoost);
+
+            // Chase speed: scale with noise, but never slower than 60% of max so enemy commits
+            float speedBoost = Mathf.Clamp01(noiseLevel * noiseMultiplier);
+            float minChaseSpeed = Mathf.Lerp(maxChaseSpeed * 0.6f, maxChaseSpeed, speedBoost);
+            agent.speed = Mathf.Max(minChaseSpeed, Mathf.Lerp(baseSpeed, maxChaseSpeed, speedBoost));
         }
         else
         {
             // Player is quiet, start losing them
             memoryTimer -= Time.deltaTime;
-            
-            if (memoryTimer <= 0f)
+
+            // Don't give up until commit time has passed (avoids dropping on brief mic dips)
+            bool commitTimePassed = (Time.time - _chaseStartTime) >= chaseCommitTime;
+            if (memoryTimer <= 0f && commitTimePassed)
             {
-                // Lost the player, go search last known location
                 StartSearching();
                 return;
             }
+            // Still chase last known position at decent speed while memory lasts
+            agent.speed = Mathf.Lerp(baseSpeed, maxChaseSpeed * 0.8f, 0.8f);
         }
-        
+
         agent.SetDestination(lastKnownPlayerPosition);
     }
 
