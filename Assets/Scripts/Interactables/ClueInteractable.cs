@@ -26,25 +26,37 @@ public class ClueInteractable : MonoBehaviour, IInteractable
         _col = GetComponent<Collider2D>();
         if (_col != null)
             _col.isTrigger = true;
+        else
+            Debug.LogWarning("[ClueInteractable] " + gameObject.name + ": No Collider2D found.", this);
 
         if (clueCanvas != null)
             clueCanvas.SetActive(false);
+        else
+            Debug.LogWarning("[ClueInteractable] " + gameObject.name + ": clueCanvas is not assigned.", this);
 
         SetInRangeVisuals(false);
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (_used) return;
-        if (!IsPlayer(other)) return;
-
+        if (_used)
+        {
+            Debug.Log("[ClueInteractable] " + gameObject.name + ": Player entered trigger but clue already used, ignoring.", this);
+            return;
+        }
+        if (!IsPlayer(other))
+        {
+            Debug.Log("[ClueInteractable] " + gameObject.name + ": OnTriggerEnter2D from non-player '" + other.gameObject.name + "' (tag=" + other.tag + "), ignoring.", this);
+            return;
+        }
+        Debug.Log("[ClueInteractable] " + gameObject.name + ": Player entered trigger, in range, press E to interact.", this);
         SetInRangeVisuals(true);
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
         if (!IsPlayer(other)) return;
-
+        Debug.Log("[ClueInteractable] " + gameObject.name + ": Player left trigger, out of range.", this);
         SetInRangeVisuals(false);
     }
 
@@ -70,8 +82,13 @@ public class ClueInteractable : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        if (_used) return;
+        if (_used)
+        {
+            Debug.Log("[ClueInteractable] " + gameObject.name + ": Interact() called but already used, ignoring.", this);
+            return;
+        }
 
+        Debug.Log("[ClueInteractable] " + gameObject.name + ": Interact() called, opening clue.", this);
         _used = true;
         SetInRangeVisuals(false);
 
@@ -83,18 +100,23 @@ public class ClueInteractable : MonoBehaviour, IInteractable
             clueCanvas.SetActive(true);
             var clueUI = clueCanvas.GetComponent<ClueUI>() ?? clueCanvas.GetComponentInChildren<ClueUI>(true);
             if (clueUI != null)
+            {
+                Debug.Log("[ClueInteractable] " + gameObject.name + ": ClueUI found on '" + clueUI.gameObject.name + "', calling Setup.", this);
                 clueUI.Setup(clueText, OnClueClosed, gameObject);
+            }
             else
-                Debug.LogWarning("ClueInteractable: No ClueUI found on clueCanvas. Add ClueUI to the canvas and assign the Close button.");
+                Debug.LogWarning("[ClueInteractable] " + gameObject.name + ": No ClueUI on clueCanvas '" + clueCanvas.name + "'. Add ClueUI component and assign Close button.", this);
         }
         else
         {
+            Debug.LogWarning("[ClueInteractable] " + gameObject.name + ": clueCanvas is null, cannot show clue.", this);
             OnClueClosed();
         }
     }
 
     private void OnClueClosed()
     {
+        Debug.Log("[ClueInteractable] " + gameObject.name + ": OnClueClosed called.", this);
         if (closeSound != null)
             closeSound.Play();
 

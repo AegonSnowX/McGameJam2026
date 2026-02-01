@@ -21,7 +21,14 @@ public class PlayerInteractor : MonoBehaviour
 
         IInteractable nearest = GetNearestInteractable();
         if (nearest != null)
+        {
+            var mb = nearest as MonoBehaviour;
+            string name = (mb != null) ? mb.gameObject.name : "?";
+            Debug.Log("[PlayerInteractor] " + interactKey + " pressed, " + _inRange.Count + " in range, interacting with '" + name + "'.", this);
             nearest.Interact();
+        }
+        else
+            Debug.Log("[PlayerInteractor] " + interactKey + " pressed, no interactable in range (count=" + _inRange.Count + ").", this);
     }
 
     private IInteractable GetNearestInteractable()
@@ -36,13 +43,14 @@ public class PlayerInteractor : MonoBehaviour
         for (int i = _inRange.Count - 1; i >= 0; i--)
         {
             var item = _inRange[i];
-            if (item == null || (item is MonoBehaviour mb && mb == null))
+            var itemMb = item as MonoBehaviour;
+            if (item == null || itemMb == null)
             {
                 _inRange.RemoveAt(i);
                 continue;
             }
 
-            Vector3 diff = ((MonoBehaviour)item).transform.position - pos;
+            Vector3 diff = itemMb.transform.position - pos;
             float sqMag = diff.sqrMagnitude;
             if (sqMag < nearestSq)
             {
@@ -71,7 +79,14 @@ public class PlayerInteractor : MonoBehaviour
         if (interactable == null)
             interactable = other.GetComponentInParent<IInteractable>();
         if (interactable != null)
+        {
+            var mb = interactable as MonoBehaviour;
+            string name = (mb != null) ? mb.gameObject.name : "?";
+            Debug.Log("[PlayerInteractor] Entered trigger of '" + other.gameObject.name + "', IInteractable found on " + name + ", registered. InRange count=" + (_inRange.Count + 1) + ".", this);
             RegisterInteractable(interactable);
+        }
+        else
+            Debug.Log("[PlayerInteractor] Entered trigger of '" + other.gameObject.name + "' (tag=" + other.tag + "), no IInteractable on this object or parent.", this);
     }
 
     void OnTriggerExit2D(Collider2D other)
@@ -80,6 +95,11 @@ public class PlayerInteractor : MonoBehaviour
         if (interactable == null)
             interactable = other.GetComponentInParent<IInteractable>();
         if (interactable != null)
+        {
+            var mb = interactable as MonoBehaviour;
+            string name = (mb != null) ? mb.gameObject.name : "?";
+            Debug.Log("[PlayerInteractor] Exited trigger of '" + other.gameObject.name + "', unregistered IInteractable from " + name + ".", this);
             UnregisterInteractable(interactable);
+        }
     }
 }

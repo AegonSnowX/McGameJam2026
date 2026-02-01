@@ -22,6 +22,8 @@ public class ClueUI : MonoBehaviour
     {
         if (closeButton != null)
             closeButton.onClick.AddListener(Close);
+        else
+            Debug.LogWarning("[ClueUI] " + gameObject.name + ": closeButton not assigned in Awake.", this);
     }
 
     void OnEnable()
@@ -36,6 +38,9 @@ public class ClueUI : MonoBehaviour
     /// </summary>
     public void Setup(string text, Action onClose, GameObject sourceToDestroyOnClose = null)
     {
+        int textLen = (text != null) ? text.Length : 0;
+        string srcName = (sourceToDestroyOnClose != null) ? sourceToDestroyOnClose.name : "null";
+        Debug.Log("[ClueUI] Setup called on '" + gameObject.name + "', text length=" + textLen + ", closeButton=" + (closeButton != null) + ", sourceToDestroy=" + srcName + ".", this);
         _onClose = onClose;
         _sourceToDestroyOnClose = sourceToDestroyOnClose;
         _pendingText = text;
@@ -47,6 +52,8 @@ public class ClueUI : MonoBehaviour
             closeButton.onClick.AddListener(Close);
             closeButton.navigation = new Navigation { mode = Navigation.Mode.None };
         }
+        else
+            Debug.LogWarning("[ClueUI] " + gameObject.name + ": closeButton is not assigned, Close cannot be triggered.", this);
     }
 
     private void ApplyPendingText()
@@ -83,6 +90,7 @@ public class ClueUI : MonoBehaviour
     /// </summary>
     public void Close()
     {
+        Debug.Log("[ClueUI] Close() called on '" + gameObject.name + "'.", this);
         if (_onClose != null)
             _onClose.Invoke();
         else
