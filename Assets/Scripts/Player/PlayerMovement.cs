@@ -31,6 +31,9 @@ public class PlayerMovement : MonoBehaviour
     // Death state
     public bool IsDead { get; private set; }
 
+    /// <summary>True while an enemy is attacking the player (player is frozen).</summary>
+    public bool IsBeingAttacked { get; private set; }
+
     void Awake()
     {
         Instance = this;
@@ -59,6 +62,11 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         if (IsDead) return;
+        if (IsBeingAttacked)
+        {
+            movementInput = Vector2.zero;
+            return;
+        }
         if (GameManager.Instance != null && GameManager.Instance.IsPaused)
         {
             movementInput = Vector2.zero;
@@ -81,6 +89,11 @@ public class PlayerMovement : MonoBehaviour
             rb.linearVelocity = Vector2.zero;
             return;
         }
+        if (IsBeingAttacked)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
         if (GameManager.Instance != null && GameManager.Instance.IsPaused)
         {
             rb.linearVelocity = Vector2.zero;
@@ -90,12 +103,24 @@ public class PlayerMovement : MonoBehaviour
         // Apply movement
         rb.linearVelocity = movementInput * moveSpeed;
     }
+
+    /// <summary>Called by Enemy when attack starts. Freezes player until death.</summary>
+    public void SetBeingAttacked(bool value)
+    {
+        IsBeingAttacked = value;
+        if (value)
+        {
+            movementInput = Vector2.zero;
+            if (rb != null) rb.linearVelocity = Vector2.zero;
+        }
+    }
     
     public void Die()
     {
         if (IsDead) return;
-        
+
         IsDead = true;
+        IsBeingAttacked = false;
         movementInput = Vector2.zero;
         rb.linearVelocity = Vector2.zero;
         

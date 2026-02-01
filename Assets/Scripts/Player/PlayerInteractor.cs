@@ -13,7 +13,7 @@ public class PlayerInteractor : MonoBehaviour
 
     void Update()
     {
-        if (PlayerMovement.Instance != null && PlayerMovement.Instance.IsDead)
+        if (PlayerMovement.Instance != null && (PlayerMovement.Instance.IsDead || PlayerMovement.Instance.IsBeingAttacked))
             return;
         if (GameManager.Instance != null && GameManager.Instance.IsPaused)
             return;
