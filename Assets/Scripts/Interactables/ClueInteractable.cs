@@ -10,8 +10,11 @@ public class ClueInteractable : MonoBehaviour, IInteractable
     [SerializeField] private bool destroyAfterClose = true;
 
     [Header("Sound")]
+    [Tooltip("Use AudioSource (its clip) or assign Open/Close Clip so sound keeps playing when clue is destroyed.")]
     [SerializeField] private AudioSource openSound;
     [SerializeField] private AudioSource closeSound;
+    [SerializeField] private AudioClip openClip;
+    [SerializeField] private AudioClip closeClip;
 
     [Header("In-range visuals (show when player can interact)")]
     [SerializeField] private GameObject outlineVisual;
@@ -92,8 +95,9 @@ public class ClueInteractable : MonoBehaviour, IInteractable
         _used = true;
         SetInRangeVisuals(false);
 
-        if (openSound != null)
-            openSound.Play();
+        AudioClip openToPlay = (openSound != null && openSound.clip != null) ? openSound.clip : openClip;
+        if (openToPlay != null)
+            AudioSource.PlayClipAtPoint(openToPlay, transform.position);
 
         if (clueCanvas != null)
         {
@@ -117,8 +121,10 @@ public class ClueInteractable : MonoBehaviour, IInteractable
     private void OnClueClosed()
     {
         Debug.Log("[ClueInteractable] " + gameObject.name + ": OnClueClosed called.", this);
-        if (closeSound != null)
-            closeSound.Play();
+        // Play close via PlayClipAtPoint so it keeps playing after this object is destroyed
+        AudioClip closeToPlay = (closeSound != null && closeSound.clip != null) ? closeSound.clip : closeClip;
+        if (closeToPlay != null)
+            AudioSource.PlayClipAtPoint(closeToPlay, transform.position);
 
         if (clueCanvas != null)
             clueCanvas.SetActive(false);

@@ -4,7 +4,9 @@ using UnityEngine;
 public class KeyCollectible : MonoBehaviour
 {
     [Header("Optional")]
+    [Tooltip("Use either: assign an AudioSource (its clip will play) or assign Collect Clip directly.")]
     [SerializeField] private AudioSource collectSound;
+    [SerializeField] private AudioClip collectClip;
     [SerializeField] private GameObject visualToHideOnCollect;
 
     private Collider2D _col;
@@ -35,8 +37,10 @@ public class KeyCollectible : MonoBehaviour
 
         _collected = true;
 
-        if (collectSound != null)
-            collectSound.Play();
+        // Play collect sound via PlayClipAtPoint so it keeps playing after the key is destroyed
+        AudioClip clipToPlay = (collectSound != null && collectSound.clip != null) ? collectSound.clip : collectClip;
+        if (clipToPlay != null)
+            AudioSource.PlayClipAtPoint(clipToPlay, transform.position);
 
         if (visualToHideOnCollect != null)
             visualToHideOnCollect.SetActive(false);
@@ -46,9 +50,6 @@ public class KeyCollectible : MonoBehaviour
         else
             Debug.LogWarning("KeyCollectible: No GameManager in scene. Key collected but win condition will not update.");
 
-        float destroyDelay = 0.1f;
-        if (collectSound != null && collectSound.clip != null)
-            destroyDelay = collectSound.clip.length + 0.1f;
-        Destroy(gameObject, destroyDelay);
+        Destroy(gameObject, 0.05f);
     }
 }
