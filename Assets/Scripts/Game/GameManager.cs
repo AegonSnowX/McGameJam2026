@@ -8,7 +8,11 @@ public class GameManager : MonoBehaviour
     [Header("UI References")]
     [SerializeField] private GameObject deathScreenUI;
     [SerializeField] private GameObject winScreenUI;
-    
+
+    [Header("HUD to hide on death/win")]
+    [Tooltip("Key count, noise meter, puzzle image, etc. These are hidden when death or win panel is shown.")]
+    [SerializeField] private GameObject[] hudToHideOnGameOver;
+
     [Header("Settings")]
     [SerializeField] private float deathScreenDelay = 0.5f;
     [SerializeField] private int keysRequiredToWin = 3;
@@ -71,7 +75,7 @@ public class GameManager : MonoBehaviour
         HasWon = true;
         if (GameAudioManager.Instance != null)
             GameAudioManager.Instance.PlayWinSound();
-        Time.timeScale = 0f;
+        PauseAndHideHud();
         if (winScreenUI != null) winScreenUI.SetActive(true);
     }
 
@@ -99,14 +103,24 @@ public class GameManager : MonoBehaviour
     private System.Collections.IEnumerator ShowDeathScreenDelayed()
     {
         yield return new WaitForSeconds(deathScreenDelay);
-        
+
+        PauseAndHideHud();
         if (deathScreenUI != null)
-        {
             deathScreenUI.SetActive(true);
-        }
-        
-        // Pause the game
+    }
+
+    private void PauseAndHideHud()
+    {
+        IsPaused = true;
         Time.timeScale = 0f;
+        if (hudToHideOnGameOver != null)
+        {
+            foreach (GameObject go in hudToHideOnGameOver)
+            {
+                if (go != null)
+                    go.SetActive(false);
+            }
+        }
     }
 
     /// <summary>Pause or resume the game (used by pause menu).</summary>
