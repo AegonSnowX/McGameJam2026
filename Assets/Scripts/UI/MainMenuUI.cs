@@ -20,9 +20,18 @@ public class MainMenuUI : MonoBehaviour
     [Header("Optional Credit Panel")]
     [Tooltip("If you use an in-scene credit panel instead of a Credit scene, assign it here.")]
     [SerializeField] private GameObject creditPanel;
+    [SerializeField] private GameObject MenuPanel;
 
     void Start()
     {
+        if(creditPanel != null)
+        {
+            creditPanel.SetActive(false);
+        }
+        if(MenuPanel != null)
+        {
+            MenuPanel.SetActive(true);
+        }
         if (startButton != null)
             startButton.onClick.AddListener(OnStartClicked);
         if (creditButton != null)
@@ -41,18 +50,23 @@ public class MainMenuUI : MonoBehaviour
         SceneManager.LoadScene(gameSceneName);
     }
 
-    private void OnCreditClicked()
+   private void OnCreditClicked()
+{
+    if (creditPanel != null && MenuPanel != null)
     {
-        if (creditPanel != null)
-        {
-            creditPanel.SetActive(!creditPanel.activeSelf);
-            return;
-        }
-        if (!string.IsNullOrEmpty(creditSceneName))
-            SceneManager.LoadScene(creditSceneName);
-        else
-            Debug.Log("Credit: Add a Credit scene to Build Settings and set creditSceneName, or assign a creditPanel.");
+        bool openCredits = !creditPanel.activeSelf;
+
+        creditPanel.SetActive(openCredits);
+        MenuPanel.SetActive(!openCredits);
+        return;
     }
+
+    if (!string.IsNullOrEmpty(creditSceneName))
+        SceneManager.LoadScene(creditSceneName);
+    else
+        Debug.Log("Credit: Add a Credit scene to Build Settings and set creditSceneName, or assign a creditPanel.");
+}
+
 
     private void OnExitClicked()
     {
