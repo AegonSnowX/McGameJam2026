@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/MenuScene.unity
     guid: a5c3d44b07340e243992018d1d703387
   - enabled: 1
-    path: Assets/Scenes/TIleMapScene.unity
+    path: Assets/Scenes/MainScene.unity
     guid: 5b7d54d2c4e7bfd4b8cc62da1a36a9b8
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
