@@ -137,10 +137,10 @@ MonoBehaviour:
   playerTag: Player
   baseSpeed: 0.5
   maxChaseSpeed: 3
-  detectionRadius: 15
+  detectionRadius: 10
   noiseMultiplier: 2
-  noiseThresholdToChase: 0.2
-  noiseThresholdToLose: 0
+  noiseThresholdToChase: 0.25
+  noiseThresholdToLose: 0.05
   chaseCommitTime: 5
   patrolPoints: []
   patrolWaitTime: 2
@@ -148,7 +148,7 @@ MonoBehaviour:
   wanderRadius: 10
   minWanderInterval: 6
   maxWanderInterval: 10
-  memoryDuration: 10
+  memoryDuration: 5
   attackAnimationDuration: 1.5
   animator: {fileID: 0}
   soundStartDelay: 2

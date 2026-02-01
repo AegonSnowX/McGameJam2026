@@ -10,7 +10,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject winScreenUI;
 
     [Header("HUD to hide on death/win")]
-    [Tooltip("Key count, noise meter, puzzle image, etc. These are hidden when death or win panel is shown.")]
+    [Tooltip("Assign one parent that contains noise slider, keys, puzzle image, etc. OR add individual elements below.")]
+    [SerializeField] private GameObject hudParentToHide;
+    [Tooltip("Or list key count, noise meter, puzzle image, etc. individually. Hidden when death or win panel is shown.")]
     [SerializeField] private GameObject[] hudToHideOnGameOver;
 
     [Header("Settings")]
@@ -91,20 +93,22 @@ public class GameManager : MonoBehaviour
     public void OnPlayerDeath()
     {
         if (IsGameOver) return;
-        
+
         IsGameOver = true;
         if (GameAudioManager.Instance != null)
             GameAudioManager.Instance.PlayDeathSound();
 
-        // Show death screen after short delay
+        // Stop game and hide HUD immediately
+        PauseAndHideHud();
+
+        // Show death panel after a short real-time delay (use Realtime so it runs while paused)
         StartCoroutine(ShowDeathScreenDelayed());
     }
 
     private System.Collections.IEnumerator ShowDeathScreenDelayed()
     {
-        yield return new WaitForSeconds(deathScreenDelay);
+        yield return new WaitForSecondsRealtime(deathScreenDelay);
 
-        PauseAndHideHud();
         if (deathScreenUI != null)
             deathScreenUI.SetActive(true);
     }
@@ -113,6 +117,10 @@ public class GameManager : MonoBehaviour
     {
         IsPaused = true;
         Time.timeScale = 0f;
+
+        if (hudParentToHide != null)
+            hudParentToHide.SetActive(false);
+
         if (hudToHideOnGameOver != null)
         {
             foreach (GameObject go in hudToHideOnGameOver)
