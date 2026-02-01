@@ -311,8 +311,8 @@ public class Enemy : MonoBehaviour
         
         float distanceToPlayer = Vector3.Distance(transform.position, target.position);
         
-        // Player is loud and within detection range
-        if (noiseLevel > noiseThresholdToChase && distanceToPlayer < detectionRadius)
+        // Player is within detection range - start chasing!
+        if (distanceToPlayer < detectionRadius)
         {
             chasingTrapSound = false;
             StartChasing();
@@ -332,31 +332,39 @@ public class Enemy : MonoBehaviour
     {
         if (target == null) return;
 
-        // Update last known position while player is loud enough
-        if (noiseLevel > noiseThresholdToLose)
+        float distanceToPlayer = Vector3.Distance(transform.position, target.position);
+        
+        // If player is within detection radius, always chase them
+        if (distanceToPlayer < detectionRadius)
         {
+            // Update position to current player position
             lastKnownPlayerPosition = target.position;
             memoryTimer = memoryDuration;
 
-            // Chase speed: scale with noise, but never slower than 60% of max so enemy commits
+            // Speed scales with noise level - louder = faster
             float speedBoost = Mathf.Clamp01(noiseLevel * noiseMultiplier);
-            float minChaseSpeed = Mathf.Lerp(maxChaseSpeed * 0.6f, maxChaseSpeed, speedBoost);
-            agent.speed = Mathf.Max(minChaseSpeed, Mathf.Lerp(baseSpeed, maxChaseSpeed, speedBoost));
+            agent.speed = Mathf.Lerp(baseSpeed, maxChaseSpeed, speedBoost);
+            
+            // Minimum speed so enemy always moves toward player
+            if (agent.speed < baseSpeed)
+            {
+                agent.speed = baseSpeed;
+            }
         }
         else
         {
-            // Player is quiet, start losing them
+            // Player escaped detection radius - start losing them
             memoryTimer -= Time.deltaTime;
 
-            // Don't give up until commit time has passed (avoids dropping on brief mic dips)
-            bool commitTimePassed = (Time.time - _chaseStartTime) >= chaseCommitTime;
-            if (memoryTimer <= 0f && commitTimePassed)
+            if (memoryTimer <= 0f)
             {
+                // Lost the player completely
                 StartSearching();
                 return;
             }
-            // Still chase last known position at decent speed while memory lasts
-            agent.speed = Mathf.Lerp(baseSpeed, maxChaseSpeed * 0.8f, 0.8f);
+            
+            // Still moving toward last known position
+            agent.speed = baseSpeed;
         }
 
         agent.SetDestination(lastKnownPlayerPosition);
@@ -371,8 +379,12 @@ public class Enemy : MonoBehaviour
 
     private void SearchForPlayer(float noiseLevel)
     {
-        // If we hear the player again, resume chase
-        if (noiseLevel > noiseThresholdToChase)
+        if (target == null) return;
+        
+        float distanceToPlayer = Vector3.Distance(transform.position, target.position);
+        
+        // If player comes back within detection radius, resume chase
+        if (distanceToPlayer < detectionRadius)
         {
             StartChasing();
             return;

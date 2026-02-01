@@ -109,7 +109,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3.5
+  m_Speed: 0.5
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -144,11 +144,11 @@ MonoBehaviour:
   chaseCommitTime: 5
   patrolPoints: []
   patrolWaitTime: 2
-  patrolSpeed: 2
+  patrolSpeed: 0.5
   wanderRadius: 5
   minWanderInterval: 2
   maxWanderInterval: 5
-  memoryDuration: 3
+  memoryDuration: 10
   attackAnimationDuration: 1.5
   animator: {fileID: 0}
   soundStartDelay: 2

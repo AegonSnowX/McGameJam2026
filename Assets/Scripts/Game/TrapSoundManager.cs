@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 /// <summary>
 /// Singleton that tracks trap sound positions. When a trap triggers, enemies are attracted to that position.
@@ -16,6 +17,11 @@ public class TrapSoundManager : MonoBehaviour
 
     public bool HasActiveSound => _hasActiveSound && Time.time < _soundEndTime;
     public Vector3 SoundPosition => _soundPosition;
+
+    /// <summary>
+    /// Event fired when a trap is activated. Passes the trap position.
+    /// </summary>
+    public event Action<Vector3> OnTrapActivated;
 
     void Awake()
     {
@@ -36,6 +42,9 @@ public class TrapSoundManager : MonoBehaviour
         _soundPosition = position;
         _soundEndTime = Time.time + (duration > 0f ? duration : defaultSoundDuration);
         _hasActiveSound = true;
+        
+        // Fire event for all subscribed enemies
+        OnTrapActivated?.Invoke(position);
     }
 
     /// <summary>
