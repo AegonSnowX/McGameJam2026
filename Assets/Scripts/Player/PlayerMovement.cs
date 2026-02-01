@@ -59,7 +59,12 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         if (IsDead) return;
-        
+        if (GameManager.Instance != null && GameManager.Instance.IsPaused)
+        {
+            movementInput = Vector2.zero;
+            return;
+        }
+
         // Get WASD input
         movementInput.x = Input.GetAxisRaw("Horizontal");
         movementInput.y = Input.GetAxisRaw("Vertical");
@@ -76,7 +81,12 @@ public class PlayerMovement : MonoBehaviour
             rb.linearVelocity = Vector2.zero;
             return;
         }
-        
+        if (GameManager.Instance != null && GameManager.Instance.IsPaused)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
         // Apply movement
         rb.linearVelocity = movementInput * moveSpeed;
     }

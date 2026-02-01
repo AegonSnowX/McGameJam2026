@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
 
     public bool IsGameOver { get; private set; }
     public bool HasWon { get; private set; }
+    public bool IsPaused { get; private set; }
     public int KeysCollected { get; private set; }
     public int KeysRequired => keysRequiredToWin;
 
@@ -33,6 +34,7 @@ public class GameManager : MonoBehaviour
         // Reset game state
         IsGameOver = false;
         HasWon = false;
+        IsPaused = false;
         KeysCollected = 0;
         HasKey1 = false;
         HasKey2 = false;
@@ -104,8 +106,16 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0f;
     }
 
+    /// <summary>Pause or resume the game (used by pause menu).</summary>
+    public void SetPaused(bool paused)
+    {
+        IsPaused = paused;
+        Time.timeScale = paused ? 0f : 1f;
+    }
+
     public void RestartGame()
     {
+        IsPaused = false;
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
