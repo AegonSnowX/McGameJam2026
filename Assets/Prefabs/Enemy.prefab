@@ -150,6 +150,7 @@ MonoBehaviour:
   memoryDuration: 3
   attackAnimationDuration: 1.5
   animator: {fileID: 0}
+  soundStartDelay: 2
   patrolSound: {fileID: 7031109018174215616}
   chaseSound: {fileID: 3496831728050790429}
   attackSound: {fileID: 0}

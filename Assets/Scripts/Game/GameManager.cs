@@ -18,6 +18,13 @@ public class GameManager : MonoBehaviour
     public int KeysCollected { get; private set; }
     public int KeysRequired => keysRequiredToWin;
 
+    /// <summary>True when key 1 (first puzzle piece) has been collected.</summary>
+    public bool HasKey1 { get; private set; }
+    /// <summary>True when key 2 (second puzzle piece) has been collected.</summary>
+    public bool HasKey2 { get; private set; }
+    /// <summary>True when key 3 (third puzzle piece) has been collected.</summary>
+    public bool HasKey3 { get; private set; }
+
     void Awake()
     {
         // Always set the instance to the new one (handles scene reloads)
@@ -27,6 +34,9 @@ public class GameManager : MonoBehaviour
         IsGameOver = false;
         HasWon = false;
         KeysCollected = 0;
+        HasKey1 = false;
+        HasKey2 = false;
+        HasKey3 = false;
         Time.timeScale = 1f;
         
         // Hide screens at start
@@ -35,12 +45,15 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Call when player collects a key. Wins the game when enough keys are collected.
+    /// Call when player collects a key. keyIndex is 1, 2, or 3 and matches the puzzle piece that key reveals.
+    /// Wins the game when all three keys are collected.
     /// </summary>
-    public void AddKey()
+    public void AddKey(int keyIndex)
     {
         if (IsGameOver || HasWon) return;
-        KeysCollected++;
+        if (keyIndex == 1 && !HasKey1) { HasKey1 = true; KeysCollected++; }
+        else if (keyIndex == 2 && !HasKey2) { HasKey2 = true; KeysCollected++; }
+        else if (keyIndex == 3 && !HasKey3) { HasKey3 = true; KeysCollected++; }
         if (KeysCollected >= keysRequiredToWin)
         {
             OnPlayerWin();
