@@ -17,6 +17,10 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] private Button creditButton;
     [SerializeField] private Button exitButton;
 
+    [Header("Optional Start sequence (monologue before game)")]
+    [Tooltip("If assigned, Start will run this sequence (camera teleport + monologue) then load the game. Otherwise Start loads the game immediately.")]
+    [SerializeField] private StartSequenceController startSequenceController;
+
     [Header("Optional Credit Panel")]
     [Tooltip("If you use an in-scene credit panel instead of a Credit scene, assign it here.")]
     [SerializeField] private GameObject creditPanel;
@@ -42,6 +46,11 @@ public class MainMenuUI : MonoBehaviour
 
     private void OnStartClicked()
     {
+        if (startSequenceController != null)
+        {
+            startSequenceController.PlayStartSequence();
+            return;
+        }
         if (string.IsNullOrEmpty(gameSceneName))
         {
             Debug.LogWarning("MainMenuUI: gameSceneName is empty. Add your game scene to Build Settings and set gameSceneName (e.g. Proto).");
