@@ -156,7 +156,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -245.8, y: -87.2}
+  m_AnchoredPosition: {x: -245.8, y: -59.8}
   m_SizeDelta: {x: 160, y: 58.68}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &7211790
@@ -9332,7 +9332,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -245.8, y: 92.3}
+  m_AnchoredPosition: {x: -245.8, y: 63.5}
   m_SizeDelta: {x: 160, y: 58.68}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &739387837
@@ -24968,6 +24968,7 @@ MonoBehaviour:
   startButton: {fileID: 739387837}
   creditButton: {fileID: 1146352906}
   exitButton: {fileID: 1859939044}
+  startSequenceController: {fileID: 0}
   creditPanel: {fileID: 58625918}
   MenuPanel: {fileID: 1037531768}
 --- !u!4 &2051766946
