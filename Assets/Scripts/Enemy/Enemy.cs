@@ -156,26 +156,24 @@ public class Enemy : MonoBehaviour
     private void UpdateEnemySounds()
     {
         if (Time.time < _soundStartTime) return;
-        if (_previousState == currentState) return;
 
-        if (patrolSound != null)
+        // On state change: stop sounds that are no longer relevant
+        if (_previousState != currentState)
         {
-            if (currentState == EnemyState.Patrolling)
-            {
-                if (!patrolSound.isPlaying) patrolSound.Play();
-            }
-            else
+            if (patrolSound != null && currentState != EnemyState.Patrolling)
                 patrolSound.Stop();
+            if (chaseSound != null && currentState != EnemyState.Chasing)
+                chaseSound.Stop();
         }
 
-        if (chaseSound != null)
+        // Every frame: keep current state's sound playing (so chase/patrol play constantly while in that state)
+        if (patrolSound != null && currentState == EnemyState.Patrolling)
         {
-            if (currentState == EnemyState.Chasing)
-            {
-                if (!chaseSound.isPlaying) chaseSound.Play();
-            }
-            else
-                chaseSound.Stop();
+            if (!patrolSound.isPlaying) patrolSound.Play();
+        }
+        if (chaseSound != null && currentState == EnemyState.Chasing)
+        {
+            if (!chaseSound.isPlaying) chaseSound.Play();
         }
     }
 
