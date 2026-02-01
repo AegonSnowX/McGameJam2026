@@ -12,7 +12,7 @@ public class DelayAction : MonoBehaviour
 
     IEnumerator WaitAndExecute()
     {
-        yield return new WaitForSeconds(3.5f);
+        yield return new WaitForSeconds(9f);
        SceneManager.LoadScene("Menu");                
         // execute after 5 seconds
         Debug.Log("Executed after 5 seconds");
