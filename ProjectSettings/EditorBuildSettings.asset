@@ -6,19 +6,22 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Scenes/JunkScenes/SampleScene/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
-    path: Assets/Scenes/HelperScenes/New Folder/Intro.unity
+    path: Assets/Scenes/Intro.unity
     guid: 7fc46dbe476bbd24182b2e3feffbd0f9
   - enabled: 1
     path: Assets/Scenes/Menu.unity
     guid: a5c3d44b07340e243992018d1d703387
   - enabled: 1
-    path: Assets/Scenes/HelperScenes/Cutscene.unity
+    path: Assets/Scenes/Cutscene.unity
     guid: 75dfcbb4552a0f94dbdfece2baafd426
   - enabled: 1
-    path: Assets/Scenes/FINALMainLevel.unity
+    path: Assets/Scenes/FinalLevel.unity
+    guid: c8b61c439913cc64baa2d00bfae4b8ce
+  - enabled: 0
+    path: Assets/Scenes/JunkScenes/SampleScene/FINALMainLevel.unity
     guid: a4ac0f9bc0e23944c8765f59d366efb8
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
