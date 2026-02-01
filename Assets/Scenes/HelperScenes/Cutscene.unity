@@ -793,7 +793,7 @@ MonoBehaviour:
   characterDelay: 0.05
   lineDelay: 0.5
   typeByCharacter: 1
-  nextSceneName: MainScene
+  nextSceneName: FINALMainLevel
   delayBeforeSceneChange: 2
   typingSound: {fileID: 0}
 --- !u!114 &1194074742
