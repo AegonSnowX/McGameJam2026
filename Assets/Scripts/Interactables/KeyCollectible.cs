@@ -3,6 +3,10 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class KeyCollectible : MonoBehaviour
 {
+    [Header("Puzzle piece (which piece this key reveals)")]
+    [Tooltip("1 = first piece, 2 = second, 3 = third. Must match the piece you assign in KeyProgressReveal.")]
+    [SerializeField] private int keyIndex = 1;
+
     [Header("Optional")]
     [Tooltip("Use either: assign an AudioSource (its clip will play) or assign Collect Clip directly.")]
     [SerializeField] private AudioSource collectSound;
@@ -46,7 +50,7 @@ public class KeyCollectible : MonoBehaviour
             visualToHideOnCollect.SetActive(false);
 
         if (GameManager.Instance != null)
-            GameManager.Instance.AddKey();
+            GameManager.Instance.AddKey(Mathf.Clamp(keyIndex, 1, 3));
         else
             Debug.LogWarning("KeyCollectible: No GameManager in scene. Key collected but win condition will not update.");
 
