@@ -11,13 +11,13 @@ GameObject:
   - component: {fileID: 2481997381749953450}
   - component: {fileID: 217875223528881622}
   - component: {fileID: 3137509429310525547}
-  - component: {fileID: 6244667995036918266}
   - component: {fileID: 5690554250347693068}
   - component: {fileID: 4720037658481097221}
   - component: {fileID: 1264859048032123011}
   - component: {fileID: 3496831728050790429}
   - component: {fileID: 7031109018174215616}
   - component: {fileID: 4913675489719527873}
+  - component: {fileID: 9206728264447355432}
   m_Layer: 0
   m_Name: EnemyHorse
   m_TagString: Untagged
@@ -122,40 +122,6 @@ NavMeshAgent:
   m_BaseOffset: 0.5
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &6244667995036918266
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2237616052264945413}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8bdd1c20c0b00d64dae00e2e1c38487d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  target: {fileID: 0}
-  playerTag: Player
-  baseSpeed: 0.5
-  maxChaseSpeed: 2
-  detectionRadius: 15
-  noiseMultiplier: 2
-  noiseThresholdToChase: 0.2
-  noiseThresholdToLose: 0.05
-  chaseCommitTime: 5
-  patrolPoints: []
-  patrolWaitTime: 2
-  patrolSpeed: 2
-  wanderRadius: 5
-  minWanderInterval: 2
-  maxWanderInterval: 5
-  memoryDuration: 3
-  attackAnimationDuration: 1.5
-  animator: {fileID: 0}
-  soundStartDelay: 2
-  patrolSound: {fileID: 7031109018174215616}
-  chaseSound: {fileID: 3496831728050790429}
-  attackSound: {fileID: 0}
 --- !u!61 &5690554250347693068
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -561,6 +527,40 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &9206728264447355432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2237616052264945413}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bdd1c20c0b00d64dae00e2e1c38487d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  target: {fileID: 0}
+  playerTag: Player
+  baseSpeed: 2
+  maxChaseSpeed: 8
+  detectionRadius: 15
+  noiseMultiplier: 2
+  noiseThresholdToChase: 0.2
+  noiseThresholdToLose: 0.02
+  chaseCommitTime: 2
+  patrolPoints: []
+  patrolWaitTime: 2
+  patrolSpeed: 2
+  wanderRadius: 5
+  minWanderInterval: 2
+  maxWanderInterval: 5
+  memoryDuration: 5
+  attackAnimationDuration: 1.5
+  animator: {fileID: 0}
+  soundStartDelay: 0
+  patrolSound: {fileID: 0}
+  chaseSound: {fileID: 0}
+  attackSound: {fileID: 0}
 --- !u!1 &2776186209382219650
 GameObject:
   m_ObjectHideFlags: 0
